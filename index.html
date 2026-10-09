@@ -1,0 +1,547 @@
+```html
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIT TIME</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f4f9;
+  color: #20283b;
+}
+header {
+  background: #202b46;
+  color: white;
+  text-align: center;
+  padding: 22px 12px;
+  font-size: 27px;
+  font-weight: bold;
+}
+.container {
+  max-width: 700px;
+  margin: 25px auto;
+  padding: 0 15px;
+}
+.card {
+  background: white;
+  padding: 22px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px #18274712;
+}
+h2 {
+  margin-top: 0;
+}
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 9px;
+  border: 1px solid #d8deea;
+  font-size: 16px;
+}
+button {
+  background: #536dfe;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  min-height: 44px;
+}
+button:active {
+  transform: scale(.98);
+}
+.secondary {
+  background: #202b46;
+}
+.danger {
+  background: #e64b5d;
+}
+.small {
+  font-size: 14px;
+  color: #68738a;
+  line-height: 1.5;
+}
+#timer {
+  text-align: center;
+  font-size: 54px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #536dfe;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.stat {
+  background: #eef1ff;
+  padding: 14px 5px;
+  border-radius: 10px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.stat strong {
+  display: block;
+  font-size: 23px;
+  margin-bottom: 5px;
+}
+.history-item {
+  border-bottom: 1px solid #e7eaf0;
+  padding: 12px 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.hidden {
+  display: none !important;
+}
+.row {
+  display: flex;
+  gap: 10px;
+}
+.row button {
+  flex: 1;
+  min-width: 0;
+}
+label {
+  display: block;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: bold;
+}
+#authMessage {
+  color: #e64b5d;
+  font-size: 14px;
+}
+
+/* Телефонға арналған дизайн */
+@media screen and (max-width: 600px) {
+  body {
+    font-size: 15px;
+  }
+  header {
+    padding: 18px 10px;
+    font-size: 24px;
+  }
+  .container {
+    width: 100%;
+    max-width: 100%;
+    margin: 12px auto;
+    padding: 0 10px;
+  }
+  .card {
+    padding: 16px;
+    margin-bottom: 13px;
+    border-radius: 13px;
+  }
+  h2 {
+    font-size: 19px;
+    line-height: 1.35;
+  }
+  input, select, button {
+    min-height: 46px;
+    font-size: 16px;
+  }
+  #timer {
+    font-size: 44px;
+    margin: 18px 0;
+  }
+  .row {
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .row button {
+    flex: 1 1 28%;
+    padding: 10px 4px;
+    font-size: 13px;
+  }
+  .stats {
+    gap: 6px;
+  }
+  .stat {
+    padding: 12px 3px;
+    font-size: 12px;
+  }
+  .stat strong {
+    font-size: 21px;
+  }
+  .history-item {
+    font-size: 14px;
+  }
+}
+@media screen and (max-width: 360px) {
+  .card {
+    padding: 12px;
+  }
+  #timer {
+    font-size: 38px;
+  }
+  .row button {
+    flex-basis: 100%;
+    font-size: 15px;
+  }
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<header>💪 FIT TIME</header>
+
+<main class="container">
+  <section id="auth" class="card">
+    <h2>FIT TIME аккаунты</h2>
+    <p class="small">Кіру немесе жаңа аккаунт ашу.</p>
+    <input id="username" placeholder="Логин" autocomplete="username">
+    <input id="password" type="password" placeholder="Құпиясөз" autocomplete="current-password">
+    <button id="loginButton">Кіру</button>
+    <button id="registerButton" class="secondary">Тіркелу</button>
+    <p id="authMessage"></p>
+    <p class="small">Ескерту: аккаунт осы браузерде ғана сақталады.</p>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="card">
+      <div class="row" style="align-items:center">
+        <div style="flex:1; min-width:0">
+          <h2 style="margin-bottom:5px">Сәлем, <span id="userLabel"></span>! 👋</h2>
+          <span class="small">Бүгінгі жаттығуыңды баста.</span>
+        </div>
+        <button id="logoutButton" class="danger" style="width:auto;margin:0">Шығу</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🏋️ Жаттығу</h2>
+
+      <label for="exercise">Жаттығу түрі</label>
+      <select id="exercise">
+        <option value="Отжимание">Отжимание</option>
+        <option value="Пресс">Пресс</option>
+      </select>
+
+      <label for="duration">Таймер ұзақтығы</label>
+      <select id="duration">
+        <option value="30">30 секунд</option>
+        <option value="60">1 минут</option>
+        <option value="120">2 минут</option>
+        <option value="180">3 минут</option>
+        <option value="300">5 минут</option>
+      </select>
+
+      <label for="reps">Қайталау саны</label>
+      <input id="reps" type="number" min="0" step="1" placeholder="Мысалы: 15">
+
+      <div id="timer">00:30</div>
+
+      <div class="row">
+        <button id="startButton">▶ Бастау</button>
+        <button id="pauseButton" class="secondary">⏸ Тоқтату</button>
+        <button id="resetButton" class="danger">↻ Қайта</button>
+      </div>
+      <p id="timerMessage" class="small" aria-live="polite">Жаттығуға дайынсың ба?</p>
+    </div>
+
+    <div class="card">
+      <h2>📊 Менің нәтижелерім</h2>
+      <div class="stats">
+        <div class="stat"><strong id="totalSessions">0</strong>Жаттығу</div>
+        <div class="stat"><strong id="totalReps">0</strong>Қайталау</div>
+        <div class="stat"><strong id="totalMinutes">0</strong>Минут</div>
+      </div>
+      <button id="saveButton">Нәтижені сақтау</button>
+    </div>
+
+    <div class="card">
+      <h2>📋 Жаттығу тарихы</h2>
+      <div id="history"></div>
+      <button id="clearButton" class="danger">Тарихты тазалау</button>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const ACCOUNTS_KEY = "fitTimeAccounts_v1";
+const SESSION_KEY = "fitTimeCurrentUser_v1";
+
+let currentUser = localStorage.getItem(SESSION_KEY);
+let countdown = null;
+let remaining = 30;
+let running = false;
+let endTime = 0;
+let audioContext = null;
+
+const $ = id => document.getElementById(id);
+
+function getAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function historyKey() {
+  return "fitTimeHistory_v1_" + currentUser;
+}
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(historyKey()) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function register() {
+  const user = $("username").value.trim();
+  const pass = $("password").value;
+  const accounts = getAccounts();
+
+  if (user.length < 3 || pass.length < 4) {
+    $("authMessage").textContent =
+      "Логин кемінде 3, құпиясөз кемінде 4 таңба болсын.";
+    return;
+  }
+
+  if (accounts[user]) {
+    $("authMessage").textContent = "Бұл логин тіркелген. Кіру батырмасын бас.";
+    return;
+  }
+
+  accounts[user] = pass;
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+  currentUser = user;
+  localStorage.setItem(SESSION_KEY, user);
+  openApp();
+}
+
+function login() {
+  const user = $("username").value.trim();
+  const pass = $("password").value;
+  const accounts = getAccounts();
+
+  if (!accounts[user] || accounts[user] !== pass) {
+    $("authMessage").textContent = "Логин немесе құпиясөз қате.";
+    return;
+  }
+
+  currentUser = user;
+  localStorage.setItem(SESSION_KEY, user);
+  openApp();
+}
+
+function openApp() {
+  $("auth").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("userLabel").textContent = currentUser;
+  resetTimer();
+  renderHistory();
+}
+
+function logout() {
+  stopInterval();
+  localStorage.removeItem(SESSION_KEY);
+  currentUser = null;
+  $("app").classList.add("hidden");
+  $("auth").classList.remove("hidden");
+  $("password").value = "";
+  $("authMessage").textContent = "";
+}
+
+function unlockAudio() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return false;
+
+  if (!audioContext) audioContext = new AudioCtx();
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume().catch(() => {});
+  }
+  return true;
+}
+
+/* Таймер аяқталғанда "ДЫҢ!" дыбысы */
+function playFinishSound() {
+  if (!unlockAudio()) {
+    $("timerMessage").textContent =
+      "Жаттығу аяқталды! 🔔 Бұл браузер дыбысты қолдамауы мүмкін.";
+    return;
+  }
+
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(880, now);
+  oscillator.frequency.setValueAtTime(1174.66, now + 0.12);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.linearRampToValueAtTime(0.35, now + 0.025);
+  gain.gain.setValueAtTime(0.3, now + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.8);
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return String(mins).padStart(2, "0") + ":" +
+         String(secs).padStart(2, "0");
+}
+
+function updateTimerDisplay() {
+  $("timer").textContent = formatTime(remaining);
+}
+
+function stopInterval() {
+  if (countdown !== null) {
+    clearInterval(countdown);
+    countdown = null;
+  }
+  running = false;
+}
+
+function startTimer() {
+  if (running) return;
+
+  // Телефонда дыбысты пайдаланушы батырманы басқан кезде дайындаймыз.
+  unlockAudio();
+
+  if (remaining <= 0) {
+    remaining = Number($("duration").value);
+  }
+
+  running = true;
+  endTime = Date.now() + remaining * 1000;
+  $("timerMessage").textContent = "Жаттығу жүріп жатыр! 💪";
+
+  countdown = setInterval(() => {
+    remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+    updateTimerDisplay();
+
+    if (remaining <= 0) {
+      stopInterval();
+      $("timerMessage").textContent = "Жаттығу аяқталды! Жарайсың! 🎉";
+      playFinishSound();
+    }
+  }, 100);
+}
+
+function pauseTimer() {
+  if (!running) return;
+
+  remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+  stopInterval();
+  updateTimerDisplay();
+  $("timerMessage").textContent = "Таймер тоқтатылды.";
+}
+
+function resetTimer() {
+  stopInterval();
+  remaining = Number($("duration").value);
+  updateTimerDisplay();
+  $("timerMessage").textContent = "Жаттығуға дайынсың ба?";
+}
+
+function saveResult() {
+  if (!currentUser) return;
+
+  const reps = Number($("reps").value);
+  const exercise = $("exercise").value;
+  const minutes = Number($("duration").value) / 60;
+
+  if ($("reps").value.trim() === "" || !Number.isFinite(reps) ||
+      reps < 0 || !Number.isInteger(reps)) {
+    $("timerMessage").textContent =
+      "Қайталау санын дұрыс енгіз (0 немесе одан үлкен бүтін сан).";
+    return;
+  }
+
+  const history = getHistory();
+  history.unshift({
+    exercise,
+    reps,
+    minutes,
+    date: new Date().toLocaleString("kk-KZ")
+  });
+
+  localStorage.setItem(historyKey(), JSON.stringify(history));
+  $("reps").value = "";
+  renderHistory();
+  $("timerMessage").textContent = "Нәтиже сақталды! ✅";
+}
+
+function renderHistory() {
+  const history = getHistory();
+
+  $("totalSessions").textContent = history.length;
+  $("totalReps").textContent = history.reduce(
+    (sum, item) => sum + (Number(item.reps) || 0), 0
+  );
+  $("totalMinutes").textContent = history.reduce(
+    (sum, item) => sum + (Number(item.minutes) || 0), 0
+  );
+
+  const area = $("history");
+  area.replaceChildren();
+
+  if (!history.length) {
+    const empty = document.createElement("p");
+    empty.className = "small";
+    empty.textContent = "Әзірше нәтиже жоқ.";
+    area.appendChild(empty);
+    return;
+  }
+
+  history.slice(0, 30).forEach(item => {
+    const entry = document.createElement("div");
+    entry.className = "history-item";
+    entry.textContent =
+      `${item.exercise} — ${item.reps} рет · ${item.minutes} мин · ${item.date}`;
+    area.appendChild(entry);
+  });
+}
+
+function clearHistory() {
+  if (!confirm("Жаттығу тарихын өшіресің бе?")) return;
+  localStorage.removeItem(historyKey());
+  renderHistory();
+}
+
+/* Батырмаларды іске қосу */
+$("loginButton").addEventListener("click", login);
+$("registerButton").addEventListener("click", register);
+$("logoutButton").addEventListener("click", logout);
+$("startButton").addEventListener("click", startTimer);
+$("pauseButton").addEventListener("click", pauseTimer);
+$("resetButton").addEventListener("click", resetTimer);
+$("saveButton").addEventListener("click", saveResult);
+$("clearButton").addEventListener("click", clearHistory);
+$("duration").addEventListener("change", resetTimer);
+
+if (currentUser && getAccounts()[currentUser]) {
+  openApp();
+}
+</script>
+</body>
+</html>
+```
+
+
